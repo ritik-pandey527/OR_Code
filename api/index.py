@@ -7,7 +7,6 @@ CORS(app)  # Enable CORS for all routes
 # Variable to store the latest sensor values
 latest_temperature = None
 latest_humidity = None
-led_state = False  # Variable to store the state of the LED (on/off)
 
 @app.route('/')
 def home():
@@ -52,16 +51,14 @@ def control_led():
         return jsonify({"error": "No state provided"}), 400
 
     state = data['state']
-    # Add code to control the LED based on the state
+    # Control the LED on ESP32
     if state:
-        # Turn the LED on
         led_state = "on"
     else:
-        # Turn the LED off
         led_state = "off"
 
-    # Return a response indicating the LED state
+    # In a real implementation, you'd send the state to the ESP32 here
     return jsonify({"status": "success", "led_state": led_state})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
