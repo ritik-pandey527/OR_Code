@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Sensor Data</title>
+    <script>
+        async function fetchSensorData() {
+            const response = await fetch('/sensor-data');
+            const data = await response.json();
+            document.getElementById('sensor-value').innerText = data.sensor_value;
+        }
+
+        // Fetch sensor data every 5 seconds
+        setInterval(fetchSensorData, 5000);
+    </script>
+</head>
+<body>
+    <h1>ESP32 Sensor Data</h1>
+    <p>Latest Sensor Value: <span id="sensor-value">Loading...</span></p>
+    <button onclick="fetchSensorData()">Refresh</button>
+</body>
+</html>
