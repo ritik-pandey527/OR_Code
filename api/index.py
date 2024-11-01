@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, render_template 
+from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -44,21 +44,5 @@ def get_sensor_data():
         "humidity": latest_humidity
     })
 
-@app.route('/led', methods=['POST'])  # Endpoint to control LED
-def control_led():
-    data = request.get_json()
-    if data is None or 'state' not in data:
-        return jsonify({"error": "No state provided"}), 400
-
-    state = data['state']
-    # Control the LED on ESP32
-    if state:
-        led_state = "on"
-    else:
-        led_state = "off"
-
-    # In a real implementation, you'd send the state to the ESP32 here
-    return jsonify({"status": "success", "led_state": led_state})
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(debug=True)
