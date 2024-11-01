@@ -23,15 +23,8 @@ def receive_sensor_data():
         temperature = data.get('temperature')
         humidity = data.get('humidity')
         
-        # Validate temperature and humidity values
         if temperature is None or humidity is None:
             return jsonify({"error": "Temperature or humidity value not found"}), 400
-        
-        if not (0 <= temperature <= 100):  # Example validation for temperature
-            return jsonify({"error": "Temperature value out of range"}), 400
-            
-        if not (0 <= humidity <= 100):  # Example validation for humidity
-            return jsonify({"error": "Humidity value out of range"}), 400
         
         # Update the latest sensor values
         latest_temperature = temperature
