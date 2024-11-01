@@ -4,13 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sensor Data Display</title>
-    <style>
-        /* Simple styling for error messages */
-        .error {
-            color: red;
-            font-weight: bold;
-        }
-    </style>
     <script>
         async function fetchSensorData() {
             try {
@@ -19,19 +12,37 @@
                     const data = await response.json();
                     document.getElementById('temperature').innerText = data.temperature !== undefined ? data.temperature + ' °C' : 'No data available';
                     document.getElementById('humidity').innerText = data.humidity !== undefined ? data.humidity + ' %' : 'No data available';
-                    document.getElementById('error-message').innerText = '';  // Clear any previous error messages
                 } else {
-                    showError('Error fetching data: ' + response.statusText);
+                    document.getElementById('temperature').innerText = 'Error fetching temperature';
+                    document.getElementById('humidity').innerText = 'Error fetching humidity';
                 }
             } catch (error) {
-                showError('Network error: ' + error.message);
+                console.error('Error:', error);
+                document.getElementById('temperature').innerText = 'Error fetching temperature';
+                document.getElementById('humidity').innerText = 'Error fetching humidity';
             }
         }
 
-        function showError(message) {
-            document.getElementById('temperature').innerText = 'No data available';
-            document.getElementById('humidity').innerText = 'No data available';
-            document.getElementById('error-message').innerText = message;  // Display the error message
+        async function toggleLED() {
+            try {
+                const ledState = document.getElementById('ledToggle').checked;
+                const response = await fetch('/led', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ state: ledState })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(data);
+                } else {
+                    console.error('Error toggling LED');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
         }
 
         // Fetch data every 5 seconds
@@ -43,7 +54,11 @@
     <div>
         <p><strong>Temperature:</strong> <span id="temperature">Loading...</span></p>
         <p><strong>Humidity:</strong> <span id="humidity">Loading...</span></p>
-        <p class="error" id="error-message"></p>  <!-- Placeholder for error messages -->
+    </div>
+    <div>
+        <label>
+            <input type="checkbox" id="ledToggle" onchange="toggleLED()"> Control LED
+        </label>
     </div>
 </body>
 </html>
