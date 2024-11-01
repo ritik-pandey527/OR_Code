@@ -1,8 +1,11 @@
 from flask import Flask, jsonify, request, render_template
-from flask_cors import CORS  # Add this line to handle CORS
+from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
+
+# Variable to store the latest sensor value
+latest_sensor_value = None
 
 @app.route('/')
 def home():
@@ -14,8 +17,9 @@ def greet():
     greeting_message = f"Hello, {name}!"
     return jsonify({"message": greeting_message})
 
-@app.route('/sensor-data', methods=['POST'])  # Endpoint for sensor data
-def sensor_data():
+@app.route('/sensor-data', methods=['POST'])  # Endpoint for receiving sensor data
+def receive_sensor_data():
+    global latest_sensor_value
     try:
         data = request.get_json()  # Get JSON data from the request
         if data is None:
@@ -24,12 +28,19 @@ def sensor_data():
         if sensor_value is None:
             return jsonify({"error": "No sensor value found"}), 400
         
-        # Process the sensor data as needed (e.g., store it in a database)
+        # Update the latest sensor value
+        latest_sensor_value = sensor_value
         
         return jsonify({"status": "success", "sensor_value": sensor_value})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500  # Return the exception message
+
+@app.route('/sensor-data', methods=['GET'])  # Endpoint for fetching sensor data
+def get_sensor_data():
+    if latest_sensor_value is None:
+        return jsonify({"sensor_value": "No data available"}), 404
+    return jsonify({"sensor_value": latest_sensor_value})
 
 if __name__ == '__main__':
     app.run(debug=True)
