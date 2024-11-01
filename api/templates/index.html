@@ -5,13 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sensor Data Display</title>
     <style>
-        /* Simple styling for error messages */
+        /* Simple styling for error messages and toggle button */
         .error {
             color: red;
             font-weight: bold;
         }
+        .toggle-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .toggle-button.off {
+            background-color: #dc3545;
+        }
     </style>
     <script>
+        let ledStatus = false;
+
         async function fetchSensorData() {
             try {
                 const response = await fetch('/sensor-data');
@@ -34,7 +49,28 @@
             document.getElementById('error-message').innerText = message;  // Display the error message
         }
 
-        // Fetch data every 5 seconds
+        async function toggleLED() {
+            try {
+                ledStatus = !ledStatus;
+                const response = await fetch(`/led`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: ledStatus ? 'on' : 'off' })
+                });
+                if (response.ok) {
+                    document.getElementById('led-button').innerText = ledStatus ? 'Turn LED Off' : 'Turn LED On';
+                    document.getElementById('led-button').classList.toggle('off', !ledStatus);
+                } else {
+                    showError('Error controlling LED: ' + response.statusText);
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            }
+        }
+
+        // Fetch sensor data every 5 seconds
         setInterval(fetchSensorData, 1000);
     </script>
 </head>
@@ -45,5 +81,6 @@
         <p><strong>Humidity:</strong> <span id="humidity">Loading...</span></p>
         <p class="error" id="error-message"></p>  <!-- Placeholder for error messages -->
     </div>
+    <button id="led-button" class="toggle-button" onclick="toggleLED()">Turn LED On</button>
 </body>
 </html>
