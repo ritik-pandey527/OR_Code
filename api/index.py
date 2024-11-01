@@ -4,10 +4,12 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
-# Variables to store the latest sensor values and LED status
+# Variable to store the latest sensor values
 latest_temperature = None
 latest_humidity = None
-led_status = False  # LED is initially off
+
+# Variable to track LED state
+led_state = "off"  # Default state is "off"
 
 @app.route('/')
 def home():
@@ -45,21 +47,19 @@ def get_sensor_data():
         "humidity": latest_humidity
     })
 
-@app.route('/led', methods=['POST'])  # Endpoint for toggling LED state
-def toggle_led():
-    global led_status
-    try:
-        data = request.get_json()  # Get JSON data from the request
-        if 'status' not in data:
-            return jsonify({"error": "LED status not specified"}), 400
-        
-        # Update the LED status based on the received data
-        led_status = True if data['status'] == 'on' else False
-        
-        return jsonify({"status": "success", "led_state": "on" if led_status else "off"})
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500  # Return the exception message
+@app.route('/led', methods=['GET', 'POST'])  # Endpoint for controlling and fetching LED state
+def control_led():
+    global led_state
+    if request.method == 'GET':
+        # Return the current LED state
+        return jsonify({"led_state": led_state})
+    elif request.method == 'POST':
+        data = request.get_json()
+        if data and "led_state" in data:
+            led_state = data["led_state"]
+            return jsonify({"status": "success", "led_state": led_state})
+        else:
+            return jsonify({"error": "Invalid data"}), 400
 
 if __name__ == '__main__':
     app.run(debug=True)
