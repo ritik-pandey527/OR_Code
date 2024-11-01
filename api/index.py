@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, render_template 
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -7,6 +7,7 @@ CORS(app)  # Enable CORS for all routes
 # Variable to store the latest sensor values
 latest_temperature = None
 latest_humidity = None
+led_state = False  # Variable to store the state of the LED (on/off)
 
 @app.route('/')
 def home():
@@ -43,6 +44,17 @@ def get_sensor_data():
         "temperature": latest_temperature,
         "humidity": latest_humidity
     })
+
+@app.route('/led', methods=['POST'])  # Endpoint for controlling the LED
+def control_led():
+    global led_state
+    data = request.get_json()
+    
+    if data is None or 'state' not in data:
+        return jsonify({"error": "No state provided"}), 400
+    
+    led_state = data['state']  # True for ON, False for OFF
+    return jsonify({"status": "success", "led_state": led_state})
 
 if __name__ == '__main__':
     app.run(debug=True)
