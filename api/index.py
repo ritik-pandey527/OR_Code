@@ -45,15 +45,22 @@ def get_sensor_data():
         "humidity": latest_humidity
     })
 
-@app.route('/led', methods=['POST'])  # Endpoint for controlling the LED
+@app.route('/led', methods=['POST'])  # Endpoint to control LED
 def control_led():
-    global led_state
     data = request.get_json()
-    
     if data is None or 'state' not in data:
         return jsonify({"error": "No state provided"}), 400
-    
-    led_state = data['state']  # True for ON, False for OFF
+
+    state = data['state']
+    # Add code to control the LED based on the state
+    if state:
+        # Turn the LED on
+        led_state = "on"
+    else:
+        # Turn the LED off
+        led_state = "off"
+
+    # Return a response indicating the LED state
     return jsonify({"status": "success", "led_state": led_state})
 
 if __name__ == '__main__':
