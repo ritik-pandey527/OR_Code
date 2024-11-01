@@ -1,31 +1,23 @@
-function greet() {
-    const name = document.getElementById('nameInput').value;
-    fetch(`/greet?name=${name}`)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('greetMessage').innerText = data.message;
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-}
-
-function sendSensorData() {
-    // Replace with actual sensor value if needed
-    const sensorValue = Math.floor(Math.random() * 1024); // Simulated sensor value
+document.getElementById('sendButton').addEventListener('click', function() {
+    const sensorValue = document.getElementById('sensorValueInput').value;
 
     fetch('/sensor-data', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ sensor_value: sensorValue })
+        body: JSON.stringify({ sensor_value: sensorValue }),
     })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('sensorResponse').innerText = `Sensor value sent: ${data.sensor_value}`;
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-}
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            document.getElementById('greeting').innerText = `Sensor Value Sent: ${data.sensor_value}`;
+        } else {
+            document.getElementById('greeting').innerText = `Error: ${data.error}`;
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        document.getElementById('greeting').innerText = 'Error sending data.';
+    });
+});
