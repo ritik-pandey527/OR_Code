@@ -15,7 +15,12 @@ def greet():
 @app.route('/sensor-data', methods=['POST'])  # New endpoint for sensor data
 def sensor_data():
     data = request.get_json()  # Get JSON data from the request
+    if data is None:
+        return jsonify({"error": "No data provided"}), 400  # Return error if no data is sent
     sensor_value = data.get('sensor_value')  # Extract sensor value
+    if sensor_value is None:
+        return jsonify({"error": "No sensor value found"}), 400  # Return error if no sensor value
+
     # Process the sensor data as needed (e.g., store it in a database)
     
     return jsonify({"status": "success", "sensor_value": sensor_value})
