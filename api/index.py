@@ -4,12 +4,17 @@ app = Flask(__name__)
 
 @app.route('/greet', methods=['GET'])
 def greet():
-    # Check if a name is provided in the request arguments
     name = request.args.get('name', 'there')
     greeting_message = f"Hello, {name}!"
-    
-    # Return a JSON response with the greeting
     return jsonify({"message": greeting_message})
+
+@app.route('/sensor-data', methods=['POST'])  # New endpoint for sensor data
+def sensor_data():
+    data = request.get_json()  # Get JSON data from the request
+    sensor_value = data.get('sensor_value')  # Extract sensor value
+    # Process the sensor data as needed (e.g., store it in a database)
+    
+    return jsonify({"status": "success", "sensor_value": sensor_value})
 
 if __name__ == '__main__':
     app.run(debug=True)
