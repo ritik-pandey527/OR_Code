@@ -4,9 +4,10 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
-# Variable to store the latest sensor values
+# Variables to store the latest sensor values and LED status
 latest_temperature = None
 latest_humidity = None
+led_status = False  # LED is initially off
 
 @app.route('/')
 def home():
@@ -43,6 +44,22 @@ def get_sensor_data():
         "temperature": latest_temperature,
         "humidity": latest_humidity
     })
+
+@app.route('/led', methods=['POST'])  # Endpoint for toggling LED state
+def toggle_led():
+    global led_status
+    try:
+        data = request.get_json()  # Get JSON data from the request
+        if 'status' not in data:
+            return jsonify({"error": "LED status not specified"}), 400
+        
+        # Update the LED status based on the received data
+        led_status = True if data['status'] == 'on' else False
+        
+        return jsonify({"status": "success", "led_state": "on" if led_status else "off"})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500  # Return the exception message
 
 if __name__ == '__main__':
     app.run(debug=True)
